@@ -1,383 +1,199 @@
-<!DOCTYPE html>
+from pathlib import Path
+import shutil, os, zipfile
+
+base = Path("/mnt/data/katya_portfolio_site_package")
+images_dir = base / "images"
+if base.exists():
+    shutil.rmtree(base)
+images_dir.mkdir(parents=True, exist_ok=True)
+
+source_images = [
+    "/mnt/data/IMG_7941.png",
+    "/mnt/data/IMG_7930.png",
+    "/mnt/data/IMG_7931.png",
+    "/mnt/data/IMG_7934.png",
+    "/mnt/data/IMG_7935.png",
+    "/mnt/data/IMG_7938.png",
+    "/mnt/data/IMG_7939.png",
+    "/mnt/data/IMG_7940.png",
+    "/mnt/data/IMG_7956.png",
+    "/mnt/data/IMG_7944.png",
+    "/mnt/data/IMG_7900.png",
+    "/mnt/data/IMG_7908.png",
+]
+
+image_names = []
+for i, src in enumerate(source_images, start=1):
+    if os.path.exists(src):
+        name = f"work-{i:02d}{Path(src).suffix.lower()}"
+        shutil.copy(src, images_dir / name)
+        image_names.append(name)
+
+html = f'''<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Katya Portfolio — Visual Designer & AI Photographer</title>
-  <meta name="description" content="Портфолио дизайнера карточек маркетплейсов, брендинга и AI-фотосъёмки для beauty, fashion и premium lifestyle брендов." />
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: Inter, Arial, sans-serif;
-      background: #0d0d0b;
-      color: #f5efe6;
-      line-height: 1.55;
-    }
-
-    a { color: inherit; text-decoration: none; }
-    img { width: 100%; display: block; border-radius: 22px; object-fit: cover; }
-
-    .page {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 28px 20px 70px;
-    }
-
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 0 42px;
-      color: #c9b99e;
-      font-size: 14px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-
-    .logo {
-      color: #f5efe6;
-      font-weight: 700;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 34px;
-      align-items: stretch;
-      min-height: 620px;
-    }
-
-    .hero-card {
-      background: linear-gradient(145deg, #171714, #0f0f0d);
-      border: 1px solid rgba(218, 190, 145, .18);
-      border-radius: 34px;
-      padding: 54px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 30px 80px rgba(0,0,0,.35);
-    }
-
-    .eyebrow {
-      color: #c8a96a;
-      text-transform: uppercase;
-      letter-spacing: .14em;
-      font-size: 13px;
-      margin-bottom: 24px;
-    }
-
-    h1 {
-      font-size: clamp(42px, 7vw, 82px);
-      line-height: .92;
-      letter-spacing: -0.06em;
-      max-width: 760px;
-    }
-
-    .hero-text {
-      max-width: 600px;
-      color: #cfc5b7;
-      font-size: 19px;
-      margin-top: 28px;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-top: 36px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 15px 22px;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 15px;
-    }
-
-    .btn-primary { background: #e7c98b; color: #111; }
-    .btn-secondary { border: 1px solid rgba(231,201,139,.4); color: #f5efe6; }
-
-    .hero-visual {
-      border-radius: 34px;
-      overflow: hidden;
-      min-height: 620px;
-      background: linear-gradient(160deg, #eadcc7, #806f5c 55%, #17120e);
-      position: relative;
-      border: 1px solid rgba(218, 190, 145, .18);
-    }
-
-    .hero-visual::after {
-      content: "AI VISUAL\A MARKETPLACE\A BRANDING";
-      white-space: pre;
-      position: absolute;
-      left: 28px;
-      bottom: 28px;
-      color: #fff4df;
-      font-size: 28px;
-      line-height: 1.05;
-      font-weight: 800;
-      letter-spacing: -.04em;
-    }
-
-    section { margin-top: 90px; }
-
-    .section-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 30px;
-      align-items: end;
-      margin-bottom: 28px;
-    }
-
-    h2 {
-      font-size: clamp(32px, 5vw, 58px);
-      line-height: .96;
-      letter-spacing: -0.05em;
-    }
-
-    .section-note {
-      color: #bfb3a3;
-      max-width: 430px;
-      font-size: 16px;
-    }
-
-    .services {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .service-card, .case-card, .about-card, .contact-card {
-      background: #151512;
-      border: 1px solid rgba(218, 190, 145, .14);
-      border-radius: 28px;
-      padding: 28px;
-    }
-
-    .number { color: #c8a96a; font-size: 14px; margin-bottom: 22px; }
-    h3 { font-size: 24px; letter-spacing: -.03em; margin-bottom: 12px; }
-    p { color: #cfc5b7; }
-
-    .cases {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-
-    .case-image {
-      height: 330px;
-      border-radius: 24px;
-      background: linear-gradient(135deg, #f0dec1, #c2a37c 45%, #17120e);
-      margin-bottom: 20px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .case-image.dark { background: linear-gradient(135deg, #161616, #514638 50%, #e7c98b); }
-    .case-image.beauty { background: linear-gradient(135deg, #f4e7d7, #d6a58d 50%, #4a3327); }
-    .case-image.market { background: linear-gradient(135deg, #f5efe6, #d7c3a0 50%, #111); }
-
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 18px;
-    }
-
-    .tag {
-      font-size: 12px;
-      color: #e7c98b;
-      border: 1px solid rgba(231,201,139,.25);
-      border-radius: 999px;
-      padding: 7px 10px;
-    }
-
-    .about-grid {
-      display: grid;
-      grid-template-columns: .8fr 1.2fr;
-      gap: 18px;
-    }
-
-    .about-card.big {
-      padding: 42px;
-      background: linear-gradient(145deg, #191915, #11110f);
-    }
-
-    .about-card.big p {
-      font-size: 20px;
-      color: #e6dccd;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-top: 22px;
-    }
-
-    .stat {
-      background: #0f0f0d;
-      border-radius: 20px;
-      padding: 20px;
-      border: 1px solid rgba(218, 190, 145, .12);
-    }
-
-    .stat strong {
-      font-size: 32px;
-      color: #e7c98b;
-      display: block;
-      letter-spacing: -.04em;
-    }
-
-    .contact-card {
-      text-align: center;
-      padding: 54px 28px;
-      background: linear-gradient(145deg, #e7c98b, #b89658);
-      color: #111;
-    }
-
-    .contact-card p { color: rgba(17,17,17,.72); max-width: 620px; margin: 18px auto 28px; }
-    .contact-card .btn { background: #111; color: #fff; }
-
-    footer {
-      margin-top: 52px;
-      color: #8f8678;
-      font-size: 14px;
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      border-top: 1px solid rgba(218,190,145,.12);
-      padding-top: 24px;
-    }
-
-    @media (max-width: 850px) {
-      .hero, .services, .cases, .about-grid, .stats { grid-template-columns: 1fr; }
-      .hero-card { padding: 34px 24px; }
-      .hero, .hero-visual { min-height: auto; }
-      .hero-visual { height: 420px; }
-      .section-head { display: block; }
-      .section-note { margin-top: 14px; }
-      footer { flex-direction: column; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KATYA ÉSTHETIQUE — Portfolio</title>
+<style>
+*{{box-sizing:border-box;margin:0;padding:0}}
+body{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;background:#120d0b;color:#fff7ef;line-height:1.45}}
+a{{color:inherit;text-decoration:none}}
+.wrap{{max-width:1180px;margin:auto;background:#17110f;min-height:100vh}}
+.header{{display:flex;justify-content:space-between;align-items:center;padding:26px 34px;border-bottom:1px solid rgba(255,255,255,.1);position:sticky;top:0;background:rgba(23,17,15,.9);backdrop-filter:blur(14px);z-index:5}}
+.logo{{font-family:Georgia,serif;font-size:25px;letter-spacing:.16em;text-transform:uppercase}}
+.tg{{border:1px solid #d8ae7b;color:#d8ae7b;border-radius:999px;padding:13px 22px;font-weight:700}}
+.hero{{padding:64px 34px 34px;display:grid;grid-template-columns:1fr .9fr;gap:28px;align-items:stretch}}
+.heroText{{background:#211714;border:1px solid rgba(216,174,123,.25);border-radius:34px;padding:44px}}
+.badge{{color:#d8ae7b;letter-spacing:.22em;text-transform:uppercase;font-size:13px;margin-bottom:26px}}
+h1{{font-family:Georgia,serif;font-size:clamp(52px,7vw,92px);line-height:.92;letter-spacing:-.06em;font-weight:400;margin-bottom:28px}}
+.lead{{font-size:24px;color:#e9d8c8;max-width:760px;margin-bottom:28px}}
+.btns{{display:flex;gap:14px;flex-wrap:wrap}}
+.btn{{padding:17px 24px;border-radius:18px;font-weight:800;background:#d8ae7b;color:#17110f}}
+.btn.dark{{background:transparent;color:#fff7ef;border:1px solid rgba(255,255,255,.2)}}
+.heroImg{{border-radius:34px;overflow:hidden;border:1px solid rgba(216,174,123,.25);background:#2a1d18}}
+.heroImg img{{width:100%;height:100%;object-fit:cover;display:block}}
+.section{{padding:46px 34px;border-top:1px solid rgba(255,255,255,.09)}}
+.sectionHead{{display:flex;justify-content:space-between;gap:24px;align-items:end;margin-bottom:28px}}
+.eyebrow{{color:#d8ae7b;letter-spacing:.2em;text-transform:uppercase;font-size:13px;margin-bottom:10px}}
+h2{{font-family:Georgia,serif;font-size:clamp(40px,6vw,70px);line-height:.95;letter-spacing:-.05em;font-weight:400}}
+.note{{max-width:420px;color:#d8c6b6;font-size:18px}}
+.grid{{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}}
+.card{{background:#fff7ef;color:#211714;border-radius:28px;overflow:hidden}}
+.card img{{width:100%;height:360px;object-fit:cover;display:block;background:#2a1d18}}
+.cardBody{{padding:22px}}
+.card h3{{font-family:Georgia,serif;font-size:28px;margin-bottom:8px;font-weight:500}}
+.card p{{color:#644f45;font-size:16px}}
+.about{{display:grid;grid-template-columns:1fr 1fr;gap:18px}}
+.panel{{background:#241814;border:1px solid rgba(216,174,123,.2);border-radius:30px;padding:34px}}
+.panel p{{font-size:21px;color:#e4d0bd;margin-top:18px}}
+.quote{{font-family:Georgia,serif;font-size:34px;line-height:1.15;color:#d8ae7b}}
+.services{{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}}
+.service{{background:#fff7ef;color:#201511;border-radius:26px;padding:24px}}
+.service .num{{font-family:Georgia,serif;font-size:44px;color:#b88855;margin-bottom:14px}}
+.service h3{{font-size:21px;margin-bottom:10px}}
+.service p{{color:#604c43;font-size:15px;margin-bottom:14px}}
+.price{{font-size:25px;font-weight:900}}
+.cta{{text-align:center;background:#fff7ef;color:#1b110e;border-radius:34px;padding:48px 28px}}
+.cta h2{{color:#1b110e;margin-bottom:18px}}
+.cta p{{font-size:21px;color:#59473f;max-width:680px;margin:0 auto 24px}}
+.cta .btn{{display:inline-block}}
+@media(max-width:850px){{
+.hero,.about{{grid-template-columns:1fr}}
+.grid{{grid-template-columns:1fr}}
+.services{{grid-template-columns:1fr}}
+.header{{padding:20px}}
+.logo{{font-size:18px}}
+.hero,.section{{padding-left:20px;padding-right:20px}}
+.heroText{{padding:30px}}
+.lead{{font-size:21px}}
+.sectionHead{{display:block}}
+.note{{margin-top:14px}}
+.card img{{height:330px}}
+}}
+</style>
 </head>
 <body>
-  <main class="page">
-    <nav class="nav">
-      <div class="logo">KATYA PORTFOLIO</div>
-      <div>Visual design · AI photo · Marketplaces</div>
-    </nav>
+<div class="wrap">
+<header class="header">
+  <div class="logo">Katya Ésthetique</div>
+  <a class="tg" href="https://t.me/pt_katya">Telegram</a>
+</header>
 
-    <header class="hero">
-      <div class="hero-card">
-        <div>
-          <div class="eyebrow">Designer & AI Photographer</div>
-          <h1>Визуал, который делает бренд дороже.</h1>
-          <p class="hero-text">Создаю карточки для OZON / Wildberries, AI-фотосъёмки, брендинг, обложки, Pinterest-визуалы и презентации, которые выглядят премиально и помогают продавать.</p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#cases">Смотреть работы</a>
-            <a class="btn btn-secondary" href="#contact">Обсудить проект</a>
-          </div>
-        </div>
-      </div>
-      <div class="hero-visual"></div>
-    </header>
+<section class="hero">
+  <div class="heroText">
+    <div class="badge">AI Visual Designer · Marketplace · Premium Content</div>
+    <h1>Делаю бренды визуально дороже</h1>
+    <p class="lead">Создаю карточки товаров, AI‑фотосъёмку и контент для beauty, fashion и lifestyle‑брендов, которые должны выделяться и продаваться.</p>
+    <div class="btns">
+      <a class="btn" href="https://t.me/pt_katya">Написать в Telegram</a>
+      <a class="btn dark" href="#works">Смотреть работы</a>
+    </div>
+  </div>
+  <div class="heroImg"><img src="images/{image_names[0]}" alt="Главная работа"></div>
+</section>
 
-    <section id="services">
-      <div class="section-head">
-        <h2>Что я делаю</h2>
-        <p class="section-note">Не просто «красивые картинки», а цельная визуальная система: от первого экрана карточки до бренда в соцсетях.</p>
-      </div>
+<section class="section" id="works">
+  <div class="sectionHead">
+    <div><div class="eyebrow">Portfolio</div><h2>Мои работы</h2></div>
+    <p class="note">Premium beauty, карточки для маркетплейсов, AI‑визуал, соцсети, fashion и UX‑подача.</p>
+  </div>
+  <div class="grid">
+    <article class="card"><img src="images/{image_names[1]}"><div class="cardBody"><h3>LÉRÉVE Hair Care</h3><p>Карточки товара, premium‑структура, визуальная иерархия и beauty‑подача.</p></div></article>
+    <article class="card"><img src="images/{image_names[2]}"><div class="cardBody"><h3>LUNÉA Beauty</h3><p>AI‑фотосъёмка для косметического бренда: кожа, свет, доверие, чистая эстетика.</p></div></article>
+    <article class="card"><img src="images/{image_names[3]}"><div class="cardBody"><h3>Premium Fashion</h3><p>Визуал для fashion‑бренда: типографика, настроение, дорогой editorial‑стиль.</p></div></article>
+    <article class="card"><img src="images/{image_names[4]}"><div class="cardBody"><h3>Social Media</h3><p>Обложки Reels и контент, который цепляет внимание в первые секунды.</p></div></article>
+    <article class="card"><img src="images/{image_names[5]}"><div class="cardBody"><h3>AI Beauty Photo</h3><p>Фотореалистичные кадры для рекламы, Pinterest, Instagram и презентаций.</p></div></article>
+    <article class="card"><img src="images/{image_names[6]}"><div class="cardBody"><h3>Beauty Campaign</h3><p>Коммерческая подача продукта через свет, цвет, композицию и premium mood.</p></div></article>
+    <article class="card"><img src="images/{image_names[8]}"><div class="cardBody"><h3>BARKO PET</h3><p>Маркетплейс‑дизайн для pet‑товара: понятная структура и сильная коммерческая подача.</p></div></article>
+    <article class="card"><img src="images/{image_names[10]}"><div class="cardBody"><h3>Website Concept</h3><p>Минималистичный сайт‑визитка: доверие, структура, быстрый контакт.</p></div></article>
+    <article class="card"><img src="images/{image_names[11]}"><div class="cardBody"><h3>Marketplace UX</h3><p>Анализ карточек, внимание покупателя, до/после и визуальная логика продаж.</p></div></article>
+  </div>
+</section>
 
-      <div class="services">
-        <article class="service-card">
-          <div class="number">01</div>
-          <h3>Карточки товаров</h3>
-          <p>Главные слайды, инфографика, преимущества, визуальная иерархия и премиальная подача для маркетплейсов.</p>
-        </article>
-        <article class="service-card">
-          <div class="number">02</div>
-          <h3>AI-фотосъёмка</h3>
-          <p>Фотореалистичные кадры для beauty, fashion, lifestyle и товаров без дорогой студийной съёмки.</p>
-        </article>
-        <article class="service-card">
-          <div class="number">03</div>
-          <h3>Айдентика бренда</h3>
-          <p>Цвета, шрифты, стиль, визуальный язык, оформление соцсетей и презентационная упаковка.</p>
-        </article>
-      </div>
-    </section>
+<section class="section">
+  <div class="about">
+    <div class="panel">
+      <div class="eyebrow">Positioning</div><h2>Кто я</h2>
+      <p>Я дизайнер и AI‑visual creator. Помогаю брендам выглядеть дороже, современнее и понятнее для покупателя.</p>
+      <p>Мой фокус — не просто «красиво», а визуал, который усиливает доверие к продукту и помогает выделиться среди конкурентов.</p>
+    </div>
+    <div class="panel">
+      <div class="quote">«Я повышаю воспринимаемую ценность продукта через визуал»</div>
+      <p>Работаю с карточками товаров, AI‑съёмкой, соцсетями, Pinterest‑контентом и визуальными системами бренда.</p>
+    </div>
+  </div>
+</section>
 
-    <section id="cases">
-      <div class="section-head">
-        <h2>Избранные кейсы</h2>
-        <p class="section-note">Здесь можно заменить цветные блоки на твои реальные работы: карточки, AI-фото, обложки, пины и презентации.</p>
-      </div>
+<section class="section">
+  <div class="sectionHead">
+    <div><div class="eyebrow">Prices</div><h2>Услуги и цены</h2></div>
+    <p class="note">Финальная стоимость зависит от объёма, сложности товара и количества визуалов.</p>
+  </div>
+  <div class="services">
+    <div class="service"><div class="num">01</div><h3>Главный слайд</h3><p>Для WB / Ozon, акцент на продукте и выгоде.</p><div class="price">от 3 500 ₽</div></div>
+    <div class="service"><div class="num">02</div><h3>Карточка товара</h3><p>5–7 слайдов, структура, инфографика, premium‑стиль.</p><div class="price">от 12 000 ₽</div></div>
+    <div class="service"><div class="num">03</div><h3>AI‑фотосъёмка</h3><p>5–15 кадров для beauty, fashion, product, lifestyle.</p><div class="price">от 8 000 ₽</div></div>
+    <div class="service"><div class="num">04</div><h3>Визуал бренда</h3><p>Карточки, соцсети, Pinterest, единый стиль.</p><div class="price">от 25 000 ₽</div></div>
+  </div>
+</section>
 
-      <div class="cases">
-        <article class="case-card">
-          <div class="case-image beauty"></div>
-          <h3>Beauty Hair Care</h3>
-          <p>Премиальная визуальная система для шампуня и кондиционера: карточки, преимущества, AI-фото и соцсети.</p>
-          <div class="tag-row"><span class="tag">OZON</span><span class="tag">Beauty</span><span class="tag">AI Photo</span></div>
-        </article>
-
-        <article class="case-card">
-          <div class="case-image market"></div>
-          <h3>Marketplace Redesign</h3>
-          <p>Редизайн карточек товара: чище структура, сильнее первый экран, понятные выгоды и дорогая подача.</p>
-          <div class="tag-row"><span class="tag">WB</span><span class="tag">UX</span><span class="tag">Infographic</span></div>
-        </article>
-
-        <article class="case-card">
-          <div class="case-image dark"></div>
-          <h3>Auréa Body Care</h3>
-          <p>Luxury body care визуал: тёплая палитра, AI-съёмка, Pinterest pins, reels covers и презентация бренда.</p>
-          <div class="tag-row"><span class="tag">Branding</span><span class="tag">Luxury</span><span class="tag">Social Media</span></div>
-        </article>
-
-        <article class="case-card">
-          <div class="case-image"></div>
-          <h3>Portfolio Presentation</h3>
-          <p>Упаковка работ в понятный формат для заказчиков: кейсы, логика, результат и визуальная уверенность.</p>
-          <div class="tag-row"><span class="tag">Presentation</span><span class="tag">Portfolio</span><span class="tag">Art Direction</span></div>
-        </article>
-      </div>
-    </section>
-
-    <section id="about">
-      <div class="about-grid">
-        <div class="about-card">
-          <div class="eyebrow">About</div>
-          <h2>Почему выбирают меня</h2>
-        </div>
-        <div class="about-card big">
-          <p>Я чувствую визуал как систему: где должен быть акцент, что продаёт, что мешает восприятию и как сделать бренд заметнее. Мне важно не просто оформить работу, а собрать картинку так, чтобы клиенту хотелось доверять, покупать и возвращаться.</p>
-          <div class="stats">
-            <div class="stat"><strong>3+</strong><p>направления: дизайн, AI, брендинг</p></div>
-            <div class="stat"><strong>100%</strong><p>фокус на эстетике и продаже</p></div>
-            <div class="stat"><strong>1</strong><p>единый стиль для бренда</p></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact">
-      <div class="contact-card">
-        <h2>Готовы усилить визуал бренда?</h2>
-        <p>Напишите мне, если вам нужны карточки товара, AI-фотосъёмка, оформление соцсетей или премиальная упаковка бренда.</p>
-        <a class="btn" href="mailto:yourmail@example.com">Связаться со мной</a>
-      </div>
-    </section>
-
-    <footer>
-      <div>© 2026 Katya Portfolio</div>
-      <div>Design · Marketplace · AI Photography</div>
-    </footer>
-  </main>
+<section class="section">
+  <div class="cta">
+    <h2>Хотите, чтобы ваш продукт выглядел дороже?</h2>
+    <p>Напишите мне в Telegram — обсудим задачу, формат и визуальное решение под ваш бренд.</p>
+    <a class="btn" href="https://t.me/pt_katya">@pt_katya</a>
+  </div>
+</section>
+</div>
 </body>
-</html>
+</html>'''
+
+(base / "index.html").write_text(html, encoding="utf-8")
+
+readme = """KATYA ÉSTHETIQUE — PORTFOLIO SITE
+
+Внутри:
+- index.html — HTML-файл сайта
+- images — папка с фотографиями работ
+
+Как открыть:
+1. Распакуйте архив.
+2. Откройте index.html двойным нажатием.
+3. Папку images не удалять и не переименовывать.
+
+Telegram для связи:
+https://t.me/pt_katya
+"""
+(base / "README.txt").write_text(readme, encoding="utf-8")
+
+zip_path = Path("/mnt/data/katya_portfolio_site_package.zip")
+if zip_path.exists():
+    zip_path.unlink()
+
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
+    for file in base.rglob("*"):
+        z.write(file, file.relative_to(base.parent))
+
+print(f"Готово: {zip_path}")
+print(f"Фото в папке: {len(image_names)}")
